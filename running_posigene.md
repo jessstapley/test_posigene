@@ -1,7 +1,35 @@
-I have mapped whole genome sequence data to a reference sequence. Then I have tried to use posigene as follows.
+# Using Posigene
+https://github.com/gengit/PosiGene
 
+# Created cds fasta files
+# step 1. map to reference genome, call variants with GATK, then use vcf file to create an individual reference fasta file for each sample.
+Map whole genome sequence reads (Illumina) to a reference genome using bwa. Call variants and pull out an alternative/individual reference fasta for each sample using GATK. The individual reference fasta will  differ to the reference genome at variable sites. At sites with inadequate coverage to call a variant, the individual reference genome is identical to the reference genome (not missing)
+
+'''
+java -Xmx4g -jar /cluster/apps/gatk/3.7/x86_64/GenomeAnalysisTK.jar \
+     -T FastaAlternateReferenceMaker \
+     -IUPAC ${name} \
+     -R /cluster/work/gdc/shared/p427/GenAccFiles/EfFl1_v0.2.fna \
+     -o ${path_out}/${name}.fasta \
+     -V ${path_out}/${name}.recode.vcf 
+'''
+# step 2
+Using a gff for the reference genome I extracted the cds from each individual reference genome using bedtools.
+
+'''
+bedtools getfasta -fi indv_ref_genome_unfiltered/"$p".fasta -bed /file.gff3 > Efcds_"$p".fasta
+
+'''
+# step 3
+Ran posigens as follows.
 '''
 perl PosiGene.pl -o=Dg_target_chr1_test2 -as=Elymus_dahuricus -tn=10 -ts=Dactylis_glomerata -bn=Dg -rs=Festuca_trachyphylla:Efcds_SRR8238189.1.fasta  -nhsbr=Dactylis_glomerata:Efcds_12H_1702_18_gtest.fasta,Holcus_lanatus:Efcds_11H_1725_18_gtest.fasta,Holcus_mollis:Efcds_5A_1715_16_gtest.fasta,Elymus_dahuricus:Efcds_SRR5420176.1_gtest.fasta
 '''
 
+# Error
+Step 4/7, 9/10 threads returned
+Step 4/7, 10/10 threads returned
+Step 4/7, creating concatenated alignment...
+An error has occured during execution...
+Try to run the program again and use the parameter "-continue" to start again from the last valid point of execution...
 
